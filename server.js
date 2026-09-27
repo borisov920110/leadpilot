@@ -1,12 +1,12 @@
+
 const express = require("express");
+const path = require("path");
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("LeadPilot работи!");
-});
+app.use(express.static(__dirname));
 
 app.post("/api/chat", (req, res) => {
   const message = req.body.message;
