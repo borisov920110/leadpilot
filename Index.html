@@ -1,52 +1,86 @@
+
 <!DOCTYPE html>
 <html lang="bg">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LeadPilot</title>
+
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f4f6f8;
       margin: 0;
-      padding: 40px;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    header span {
+      font-size: 13px;
+      opacity: 0.8;
     }
 
     .container {
-      max-width: 700px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
     }
 
-    h1 {
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
       margin-top: 0;
     }
 
-    #chat {
-      height: 350px;
+    .chat {
+      height: 420px;
       overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 15px;
+      border: 1px solid #e5e7eb;
       border-radius: 10px;
+      padding: 15px;
       margin-bottom: 15px;
+      background: #fafafa;
     }
 
     .message {
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 8px;
+      margin-bottom: 12px;
+      padding: 10px 13px;
+      border-radius: 10px;
+      max-width: 85%;
+      line-height: 1.4;
     }
 
     .bot {
-      background: #eef2ff;
+      background: #e5e7eb;
     }
 
     .user {
-      background: #e8f5e9;
-      text-align: right;
+      background: #2563eb;
+      color: white;
+      margin-left: auto;
     }
 
     .input-area {
@@ -56,81 +90,29 @@
 
     input {
       flex: 1;
-      padding: 12px;
-      border: 1px solid #ccc;
+      padding: 13px;
+      border: 1px solid #d1d5db;
       border-radius: 8px;
+      font-size: 16px;
     }
 
     button {
-      padding: 12px 20px;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
-      background: #111827;
+      padding: 13px 18px;
+      background: #2563eb;
       color: white;
+      font-size: 15px;
+      cursor: pointer;
     }
-  </style>
-</head>
 
-<body>
+    button:hover {
+      background: #1d4ed8;
+    }
 
-<div class="container">
-  <h1>🚀 LeadPilot</h1>
-  <p>AI асистент за вашия бизнес</p>
+    .dashboard-button {
+      background: #10b981;
+      margin-bottom: 15px;
+    }
 
-  <div id="chat">
-    <div class="message bot">
-      Здравейте! 👋 Как мога да ви помогна?
-    </div>
-  </div>
-
-  <div class="input-area">
-    <input id="messageInput" placeholder="Напишете съобщение...">
-    <button onclick="sendMessage()">Изпрати</button>
-  </div>
-</div>
-
-<script>
-async function sendMessage() {
-  const input = document.getElementById("messageInput");
-  const message = input.value.trim();
-
-  if (!message) return;
-
-  const chat = document.getElementById("chat");
-
-  const userMessage = document.createElement("div");
-  userMessage.className = "message user";
-  userMessage.textContent = message;
-  chat.appendChild(userMessage);
-
-  input.value = "";
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await response.json();
-
-    const botMessage = document.createElement("div");
-    botMessage.className = "message bot";
-    botMessage.textContent = data.reply;
-    chat.appendChild(botMessage);
-
-    chat.scrollTop = chat.scrollHeight;
-  } catch (error) {
-    const botMessage = document.createElement("div");
-    botMessage.className = "message bot";
-    botMessage.textContent = "Възникна грешка.";
-    chat.appendChild(botMessage);
-  }
-}
-</script>
-
-</body>
-</html>
+    .
