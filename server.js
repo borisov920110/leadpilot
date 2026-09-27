@@ -4,7 +4,7 @@ const path = require("path");
 const OpenAI = require("openai");
 
 const app = express();
-
+let leads = [];
 app.use(express.json());
 
 const client = new OpenAI({
