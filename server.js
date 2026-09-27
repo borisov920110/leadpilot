@@ -35,8 +35,17 @@ const systemPrompt = `
       model: "openai/gpt-oss-120b:fastest",
       messages: [
         {
-          role: "user",
-          content: message
+          
+        messages: [
+  {
+    role: "system",
+    content: systemPrompt
+  },
+  {
+    role: "user",
+    content: message
+  }
+]
         }
       ]
     });
