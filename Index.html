@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LeadPilot</title>
+
   <style>
     body {
       margin: 0;
@@ -110,6 +111,10 @@
       .input-area {
         flex-direction: column;
       }
+
+      table {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -129,6 +134,7 @@
     </button>
 
     <div id="chatSection">
+
       <h2>AI асистент</h2>
 
       <div id="chat" class="chat">
@@ -138,22 +144,31 @@
       </div>
 
       <div class="input-area">
+
         <input
           id="messageInput"
           type="text"
           placeholder="Напишете съобщение..."
         >
 
-        <button onclick="sendMessage()">Изпрати</button>
+        <button onclick="sendMessage()">
+          Изпрати
+        </button>
+
       </div>
+
     </div>
 
     <div id="dashboardSection" class="hidden">
+
       <h2>📊 Dashboard</h2>
 
-      <p>Тук ще виждате събраните потенциални клиенти.</p>
+      <p>
+        Тук ще виждате събраните потенциални клиенти.
+      </p>
 
       <table>
+
         <thead>
           <tr>
             <th>Име</th>
@@ -162,77 +177,205 @@
           </tr>
         </thead>
 
-        <tbody>
+        <tbody id="leadsTable">
           <tr>
-            <td colspan="3">Все още няма записани leads.</td>
+            <td colspan="3">
+              Зареждане...
+            </td>
           </tr>
         </tbody>
+
       </table>
 
       <br>
 
-      <button onclick="showChat()">← Назад към чата</button>
+      <button onclick="showChat()">
+        ← Назад към чата
+      </button>
+
     </div>
 
   </div>
 </div>
 
 <script>
+
 async function sendMessage() {
+
   const input = document.getElementById("messageInput");
+
   const message = input.value.trim();
 
   if (!message) return;
 
   addMessage(message, "user");
+
   input.value = "";
 
   try {
+
     const response = await fetch("/api/chat", {
+
       method: "POST",
+
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ message })
+
+      body: JSON.stringify({
+        message: message
+      })
+
     });
 
     const data = await response.json();
+
     addMessage(data.reply, "bot");
 
   } catch (error) {
+
     addMessage(
       "Възникна грешка при свързването с AI.",
       "bot"
     );
+
   }
+
 }
 
+
 function addMessage(text, type) {
+
   const chat = document.getElementById("chat");
+
   const message = document.createElement("div");
 
   message.className = "message " + type;
+
   message.textContent = text;
 
   chat.appendChild(message);
+
   chat.scrollTop = chat.scrollHeight;
+
 }
+
+
+async function loadLeads() {
+
+  try {
+
+    const response = await fetch("/api/leads");
+
+    const leads = await response.json();
+
+    const table = document.getElementById("leadsTable");
+
+    if (!leads.length) {
+
+      table.innerHTML = `
+        <tr>
+          <td colspan="3">
+            Все още няма записани leads.
+          </td>
+        </tr>
+      `;
+
+      return;
+    }
+
+    table.innerHTML = leads.map(lead => `
+
+      <tr>
+
+        <td>
+          ${escapeHtml(lead.name)}
+        </td>
+
+        <td>
+          ${escapeHtml(lead.contact)}
+        </td>
+
+        <td>
+          ${escapeHtml(lead.request)}
+        </td>
+
+      </tr>
+
+    `).join("");
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById("leadsTable").innerHTML = `
+      <tr>
+        <td colspan="3">
+          Грешка при зареждането.
+        </td>
+      </tr>
+    `;
+
+  }
+
+}
+
+
+function escapeHtml(value) {
+
+  return String(value || "")
+
+    .replace(/&/g, "&amp;")
+
+    .replace(/</g, "&lt;")
+
+    .replace(/>/g, "&gt;")
+
+    .replace(/"/g, "&quot;")
+
+    .replace(/'/g, "&#039;");
+
+}
+
 
 function showDashboard() {
-  document.getElementById("chatSection").classList.add("hidden");
-  document.getElementById("dashboardSection").classList.remove("hidden");
+
+  document
+    .getElementById("chatSection")
+    .classList.add("hidden");
+
+  document
+    .getElementById("dashboardSection")
+    .classList.remove("hidden");
+
+  loadLeads();
+
 }
+
 
 function showChat() {
-  document.getElementById("dashboardSection").classList.add("hidden");
-  document.getElementById("chatSection").classList.remove("hidden");
+
+  document
+    .getElementById("dashboardSection")
+    .classList.add("hidden");
+
+  document
+    .getElementById("chatSection")
+    .classList.remove("hidden");
+
 }
 
-document.getElementById("messageInput").addEventListener("keydown", function(event) {
-  if (event.key === "Enter") {
-    sendMessage();
-  }
-});
+
+document
+  .getElementById("messageInput")
+  .addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+
+  });
+
 </script>
 
 </body>
