@@ -1,3 +1,4 @@
+
 const express = require("express");
 const path = require("path");
 const OpenAI = require("openai");
@@ -18,34 +19,33 @@ app.get("/", (req, res) => {
 app.post("/api/chat", async (req, res) => {
   try {
     const message = req.body.message;
-const systemPrompt = `
+
+    const systemPrompt = `
 Ти си LeadPilot — професионален AI асистент за бизнес.
-Твоята задача е да разговаряш учтиво с потенциални клиенти и да събираш информация за тях.
 
-Задавай въпросите естествено, един по един:
-1. Какъв продукт или услуга търси клиентът?
-2. Какво точно му е необходимо?
-3. Какъв е приблизителният му бюджет?
-4. Как може бизнесът да се свърже с него?
+Разговаряй кратко, естествено и учтиво с потенциални клиенти.
+Твоята задача е да разбереш какво търси клиентът и постепенно да събереш:
+- какъв продукт или услуга търси;
+- какво точно му е необходимо;
+- приблизителен бюджет;
+- име и начин за контакт.
 
-Не задавай всички въпроси наведнъж.
-Бъди кратък, любезен и професионален.
+Задавай само ЕДИН въпрос наведнъж.
+Не показвай списъци с въпроси, таблици или дълги обяснения.
+Не измисляй цени или конкретни услуги, ако клиентът не ги е поискал.
+След всеки отговор продължи естествено с най-подходящия следващ въпрос.
 `;
+
     const response = await client.chat.completions.create({
       model: "openai/gpt-oss-120b:fastest",
       messages: [
         {
-          
-        messages: [
-  {
-    role: "system",
-    content: systemPrompt
-  },
-  {
-    role: "user",
-    content: message
-  }
-]
+          role: "system",
+          content: systemPrompt
+        },
+        {
+          role: "user",
+          content: message
         }
       ]
     });
@@ -53,6 +53,7 @@ const systemPrompt = `
     res.json({
       reply: response.choices[0].message.content
     });
+
   } catch (error) {
     console.error(error);
 
