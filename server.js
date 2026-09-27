@@ -7,7 +7,8 @@ const app = express();
 app.use(express.json());
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  baseURL: "https://router.huggingface.co/v1",
+  apiKey: process.env.HF_TOKEN
 });
 
 app.get("/", (req, res) => {
@@ -18,13 +19,18 @@ app.post("/api/chat", async (req, res) => {
   try {
     const message = req.body.message;
 
-    const response = await client.responses.create({
-      model: "gpt-5-mini",
-      input: message
+    const response = await client.chat.completions.create({
+      model: "openai/gpt-oss-120b:fastest",
+      messages: [
+        {
+          role: "user",
+          content: message
+        }
+      ]
     });
 
     res.json({
-      reply: response.output_text
+      reply: response.choices[0].message.content
     });
   } catch (error) {
     console.error(error);
