@@ -1,24 +1,136 @@
-server.js
-const express = require("express");
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadPilot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 40px;
+    }
 
-const app = express();
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+    }
 
-app.use(express.json());
+    h1 {
+      margin-top: 0;
+    }
 
-app.get("/", (req, res) => {
-  res.send("LeadPilot работи!");
-});
+    #chat {
+      height: 350px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
 
-app.post("/api/chat", (req, res) => {
-  const message = req.body.message;
+    .message {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+    }
 
-  res.json({
-    reply: "Получих съобщението: " + message
-  });
-});
+    .bot {
+      background: #eef2ff;
+    }
 
-const PORT = process.env.PORT || 3000;
+    .user {
+      background: #e8f5e9;
+      text-align: right;
+    }
 
-app.listen(PORT, () => {
-  console.log(`LeadPilot работи на порт ${PORT}`);
-});
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #111827;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🚀 LeadPilot</h1>
+  <p>AI асистент за вашия бизнес</p>
+
+  <div id="chat">
+    <div class="message bot">
+      Здравейте! 👋 Как мога да ви помогна?
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input id="messageInput" placeholder="Напишете съобщение...">
+    <button onclick="sendMessage()">Изпрати</button>
+  </div>
+</div>
+
+<script>
+async function sendMessage() {
+  const input = document.getElementById("messageInput");
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  const chat = document.getElementById("chat");
+
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user";
+  userMessage.textContent = message;
+  chat.appendChild(userMessage);
+
+  input.value = "";
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    });
+
+    const data = await response.json();
+
+    const botMessage = document.createElement("div");
+    botMessage.className = "message bot";
+    botMessage.textContent = data.reply;
+    chat.appendChild(botMessage);
+
+    chat.scrollTop = chat.scrollHeight;
+  } catch (error) {
+    const botMessage = document.createElement("div");
+    botMessage.className = "message bot";
+    botMessage.textContent = "Възникна грешка.";
+    chat.appendChild(botMessage);
+  }
+}
+</script>
+
+</body>
+</html>
