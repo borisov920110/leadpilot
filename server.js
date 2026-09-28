@@ -2,18 +2,20 @@ const express = require("express");
 const path = require("path");
 const OpenAI = require("openai");
 const { createClient } = require("@supabase/supabase-js");
+
 const app = express();
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SECRET_KEY
 );
+
 app.use(express.json());
 
 const client = new OpenAI({
   baseURL: "https://router.huggingface.co/v1",
   apiKey: process.env.HF_TOKEN
 });
-
 
 let conversations = {};
 
@@ -39,23 +41,33 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api/leads", async (req, res) => {
+  try {
     const { data, error } = await supabase
-    .from("Leads")
-    .select("id, name, Contact, request, created_at")
-    .order("created_at", { ascending: false });
+      .from("Leads")
+      .select("id, name, Contact, request, created_at")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    return res.status(500).json({ error: error.message });
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+
+    res.json(data || []);
+  } catch (error) {
+    console.error("Supabase read error:", error);
+    res.status(500).json({ error: "Failed to load leads." });
   }
-
-  res.json(data);
 });
 
 app.post("/api/chat", async (req, res) => {
   try {
     const message = req.body.message;
-
     const sessionId = req.body.sessionId || "default";
+
+    if (!message) {
+      return res.status(400).json({
+        reply: "Моля, напишете съобщение."
+      });
+    }
 
     if (!conversations[sessionId]) {
       conversations[sessionId] = [];
@@ -116,30 +128,36 @@ app.post("/api/chat", async (req, res) => {
       );
 
       if (lead.name && lead.contact) {
-        
-          
-            
-            
-        
+        const { data: existing, error: existingError } = await supabase
+          .from("Leads")
+          .select("id")
+          .eq("name", lead.name)
+          .eq("Contact", lead.contact)
+          .limit(1);
 
-        if (!existing?.length) {
-  const { error } = await supabase.from("Leads").insert({
-    name: lead.name,
-    Contact: lead.contact,
-    request: lead.request || ""
-  });
+        if (existingError) {
+          console.error("Supabase lookup error:", existingError);
+        } else if (!existing?.length) {
+          const { error: insertError } = await supabase
+            .from("Leads")
+            .insert({
+              name: lead.name,
+              Contact: lead.contact,
+              request: lead.request || ""
+            });
 
-  if (error) {
-    console.error("Supabase insert error:", error);
-  }
+          if (insertError) {
+            console.error("Supabase insert error:", insertError);
+          }
         }
+      }
+    } catch (error) {
       console.error("Lead extraction error:", error);
     }
 
     res.json({
       reply
     });
-
   } catch (error) {
     console.error(error);
 
