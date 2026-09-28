@@ -14,7 +14,7 @@ const client = new OpenAI({
   apiKey: process.env.HF_TOKEN
 });
 
-let leads = [];
+
 let conversations = {};
 
 const systemPrompt = `
@@ -116,21 +116,23 @@ app.post("/api/chat", async (req, res) => {
       );
 
       if (lead.name && lead.contact) {
-        const exists = leads.some(
-          item =>
-            item.name === lead.name &&
-            item.contact === lead.contact
-        );
+        
+          
+            
+            
+        
 
-        if (!exists) {
-          leads.push({
-            name: lead.name,
-            contact: lead.contact,
-            request: lead.request || ""
-          });
+        if (!existing?.length) {
+  const { error } = await supabase.from("Leads").insert({
+    name: lead.name,
+    Contact: lead.contact,
+    request: lead.request || ""
+  });
+
+  if (error) {
+    console.error("Supabase insert error:", error);
+  }
         }
-      }
-    } catch (error) {
       console.error("Lead extraction error:", error);
     }
 
