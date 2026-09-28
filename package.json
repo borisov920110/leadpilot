@@ -1,10 +1,10 @@
-
 {
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.21.2",
-    "openai": "^7.23.0"
+    "openai": "^7.23.0",
+    "@supabase/supabase-js": "^2.57.4"
   }
 }
