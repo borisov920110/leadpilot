@@ -3,7 +3,10 @@ const path = require("path");
 const OpenAI = require("openai");
 const { createClient } = require("@supabase/supabase-js");
 const app = express();
-
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY
+);
 app.use(express.json());
 
 const client = new OpenAI({
