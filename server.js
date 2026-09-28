@@ -38,8 +38,17 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "Index.html"));
 });
 
-app.get("/api/leads", (req, res) => {
-  res.json(leads);
+app.get("/api/leads", async (req, res) => {
+    const { data, error } = await supabase
+    .from("Leads")
+    .select("id, name, Contact, request, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return res.status(500).json({ error: error.message });
+  }
+
+  res.json(data);
 });
 
 app.post("/api/chat", async (req, res) => {
