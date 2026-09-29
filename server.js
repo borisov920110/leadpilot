@@ -113,7 +113,7 @@ app.post("/api/chat", async (req, res) => {
     });
 
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-5.6-luna",
       messages: [
         {
           role: "system",
@@ -131,7 +131,7 @@ app.post("/api/chat", async (req, res) => {
     });
 
     const extraction = await client.chat.completions.create({
-      model: "gpt-4o-mini",
+       model: "gpt-5.6-luna",
       messages: [
         {
           role: "system",
